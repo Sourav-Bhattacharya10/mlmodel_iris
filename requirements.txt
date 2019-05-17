@@ -1,0 +1,13 @@
+xlrd
+numpy
+pandas
+pymssql
+pymongo
+scikit-learn
+keras
+h5py
+tensorflow
+Flask
+Flask-Cors
+uwsgi
+requests
