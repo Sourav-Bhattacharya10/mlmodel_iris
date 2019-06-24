@@ -155,11 +155,11 @@
             }
         ]
     },
-    "logfilepath" : "/root/home/logs/mlmodel_iris/python/logfile.log",
+    "logfilepath" : "/home/deviac/home/logs/mlmodel_iris/python/logfile.log",
     "modelfolder":"./savedmodelfolder/",
     "scalerfilename" : "ModelScalerObject.joblib",
     "savedmodelfilename" : "IrisModelWeights.h5",
     "metricfilepath" : "metric.json",
     "dictuniquevaluefilepath": "dictUniqueValues.joblib",
-    "mlpipelinepath" : "/root/home/deployedmodels/irismodel/mlmodel_iris"
+    "mlpipelinepath" : "/home/deviac/home/deployedmodels/irismodel/mlmodel_iris"
 }

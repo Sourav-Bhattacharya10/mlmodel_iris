@@ -3,7 +3,6 @@
 # Default libraries
 import sys
 import json
-import logging
 from datetime import datetime
 
 # Libraries that needs to be installed
@@ -19,6 +18,7 @@ with open("config.json") as g:
 
 sys.path.append(gdata["mlpipelinepath"])
 
+from ml_pipeline.logging import Logger
 from ml_pipeline.data_input import inputData
 from ml_pipeline.data_processing import processData
 from ml_pipeline.data_processing import dummifyData
@@ -34,7 +34,7 @@ from framework_models.keras_model import saveModelWeights
 
 
 # Basic Logger
-logging.basicConfig(filename = gdata["logfilepath"], level = logging.INFO)
+logger = Logger(logfilepath = gdata["logfilepath"])
 
 
 #****************************************     MODEL     ****************************************************#
@@ -54,12 +54,12 @@ def MyKerasModel(num_input = 1, num_h1 = 1, num_h2 = 1, num_output = 3):
         
         model.compile(loss='categorical_crossentropy', optimizer=simple_adam, metrics=['accuracy'])
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Compiled model')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Compiled model')
 
     except Exception as e:
 
         model = None
-        logging.exception(str(datetime.today()) + ' : TRAIN - Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Exception - ' + str(e.with_traceback))
     
     return model
 
@@ -93,39 +93,39 @@ def training():
         # Fetch data using inputData method of ml_pipeline
         df1 = inputData("csv")
         
-        logging.info(str(datetime.today()) + ' : TRAIN - Got data')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Got data')
 
         df2 = processData(df1, columnsNamesToWorkWith = ['petal_length','petal_width','sepal_length','sepal_width','label'], shuffleData = True, substituteEmptyFields = False)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Filtered columns to work with and shuffled data')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Filtered columns to work with and shuffled data')
 
         colslist = getObjectTypeColumns(df2)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Got Object type columns for one hot encoding')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Got Object type columns for one hot encoding')
 
         uvDict = getUniqueValuesDictionary(df2, colslist)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Got unique values from the object type columns')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Got unique values from the object type columns')
 
         df3 = dummifyData(df2, uvDict)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Dummified data')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Dummified data')
 
         listcolYNames = ['label_' + x for x in uvDict['label']]
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Got one hot encoded column names for Y dataset')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Got one hot encoded column names for Y dataset')
 
         Xdata, Ydata = divideDataInXY(df3, listcolYNames)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Divided data in X and Y')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Divided data in X and Y')
 
         Xdata = normalizeData(Xdata, fit_transform = True)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Normalized Xdata using MinMaxScaler with fit transform as True')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Normalized Xdata using MinMaxScaler with fit transform as True')
 
         trainX, trainY, testX, testY = generateTrainAndTestXY(Xdata, Ydata, splitfraction = 0.9)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Split data in train and test sets')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Split data in train and test sets')
 
         with tf.Session(graph=tf.Graph()) as sess:
             Kb.set_session(sess)
@@ -146,20 +146,21 @@ def training():
             #Save the model weights
             saveModelWeights(model)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Trained, evaluated and saved the model')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Trained, evaluated and saved the model')
 
-        logging.info(str(datetime.today()) + ' : TRAIN - TrainLoss is ' + str(trainScore) + ' and TestLoss is ' + str(testScore))
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - TrainLoss is ' + str(trainScore) + ' and TestLoss is ' + str(testScore))
 
         # Write the Metric value
         metricfile = str(data["modelfolder"]) + str(data["metricfilepath"])
         with open(metricfile, 'w+') as outfile:
             json.dump({"trainaccuracy": str(trainScore), "testaccuracy" : str(testScore)}, outfile)
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Wrote Metric values')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Wrote Metric values')
 
     except Exception as e:
         
-        logging.exception(str(datetime.today()) + ' : TRAIN - Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Exception - ' + str(e.with_traceback))
+        
 
 
 #***********************************************************************************************************#

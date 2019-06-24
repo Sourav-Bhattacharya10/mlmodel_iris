@@ -1,6 +1,5 @@
 # 'pip install xlrd' for excel files
 import json
-import logging
 from datetime import datetime
 import pandas as pd
 import pymssql
@@ -10,8 +9,10 @@ import requests
 with open("config.json") as g:
         gdata = json.load(g)
 
+from ml_pipeline.logging import Logger
+
 # Basic Logger
-logging.basicConfig(filename = gdata["logfilepath"], level = logging.INFO)
+logger = Logger(logfilepath = gdata["logfilepath"])
 
 def inputData(sourceType, fileIndex = 0, connIndex = 0, strSelectQuery = None, dictFindQuery = None, dictProjectQuery = None, dictSortQuery = None, numLimit = None, queryIndex = 0, endpointIndex = 0, headerslist = []):
     """
@@ -55,7 +56,7 @@ def inputData(sourceType, fileIndex = 0, connIndex = 0, strSelectQuery = None, d
 
     except Exception as e:
         resultingDataFrame = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
     
     return resultingDataFrame
 
@@ -66,17 +67,17 @@ def csvInput(fileIndex = 0):
         data = json.load(f)
 
     csvfilepath = data["csv"]["files"][fileIndex]["file"]
-    logging.info(str(datetime.today()) + ' : CSV File')
+    logger.writeToFile(str(datetime.today()) + ' : CSV File')
     
     rs = None
 
     try:
         rs = pd.read_csv(csvfilepath)
-        logging.info(str(datetime.today()) + ' : Got data')
+        logger.writeToFile(str(datetime.today()) + ' : Got data')
 
     except Exception as e:
         rs = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
     return rs
 
@@ -87,17 +88,17 @@ def tsvInput(fileIndex = 0):
         data = json.load(f)
 
     tsvfilepath = data["tsv"]["files"][fileIndex]["file"]
-    logging.info(str(datetime.today()) + ' : TSV File')
+    logger.writeToFile(str(datetime.today()) + ' : TSV File')
     
     rs = None
 
     try:
         rs = pd.read_csv(tsvfilepath, sep = '\t')
-        logging.info(str(datetime.today()) + ' : Got data')
+        logger.writeToFile(str(datetime.today()) + ' : Got data')
 
     except Exception as e:
         rs = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
         
     return rs
 
@@ -108,17 +109,17 @@ def excelInput(fileIndex = 0):
         data = json.load(f)
 
     excelfilepath = data["excel"]["files"][fileIndex]["file"]
-    logging.info(str(datetime.today()) + ' : Excel File')
+    logger.writeToFile(str(datetime.today()) + ' : Excel File')
     
     rs = None
 
     try:
         rs = pd.read_excel(excelfilepath)
-        logging.info(str(datetime.today()) + ' : Got data')
+        logger.writeToFile(str(datetime.today()) + ' : Got data')
 
     except Exception as e:
         rs = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
     return rs
 
@@ -129,17 +130,17 @@ def jsonInput(fileIndex = 0):
         data = json.load(f)
 
     jsonfilepath = data["json"]["files"][fileIndex]["file"]
-    logging.info(str(datetime.today()) + ' : JSON File')
+    logger.writeToFile(str(datetime.today()) + ' : JSON File')
     
     rs = None
 
     try:
         rs = pd.read_json(jsonfilepath)
-        logging.info(str(datetime.today()) + ' : Got data')
+        logger.writeToFile(str(datetime.today()) + ' : Got data')
 
     except Exception as e:
         rs = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
     return rs
 
@@ -170,14 +171,14 @@ def sqldatabaseInput(connIndex = 0, strSelectQuery = None, queryIndex = 0):
     username = connection1["username"]
     userpassword = connection1["userpassword"]
     databasename = connection1["databasename"]
-    logging.info(str(datetime.today()) + ' : SQL Database')
+    logger.writeToFile(str(datetime.today()) + ' : SQL Database')
     
     rs = None
 
     try:
         con = pymssql.connect(server = servername, user = username, password = userpassword, database = databasename)
         cur = con.cursor()
-        logging.info(str(datetime.today()) + ' : Database Connected')
+        logger.writeToFile(str(datetime.today()) + ' : Database Connected')
 
         # Retrieve all data using query
         if strSelectQuery == None:
@@ -198,11 +199,11 @@ def sqldatabaseInput(connIndex = 0, strSelectQuery = None, queryIndex = 0):
 
         for i in range(len(columns)):
             rs[columns[i]] = getColumnValues(rows, i)
-        logging.info(str(datetime.today()) + ' : Got data')
+        logger.writeToFile(str(datetime.today()) + ' : Got data')
 
     except Exception as e:
         rs = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
     return rs
 
@@ -214,13 +215,13 @@ def nosqldatabaseInput(connIndex = 0, dictFindQuery = None, dictProjectQuery = N
 
     connection1 = data["nosqldatabase"]["connections"][connIndex]
     connectionurl = connection1["connectionurl"]
-    logging.info(str(datetime.today()) + ' : NoSQL Database')
+    logger.writeToFile(str(datetime.today()) + ' : NoSQL Database')
     
     rs = None
 
     try:
         client = pymongo.MongoClient(connectionurl)
-        logging.info(str(datetime.today()) + ' : Database Connected')
+        logger.writeToFile(str(datetime.today()) + ' : Database Connected')
 
         # Retrieve all data using query
         databasename = connection1["databasename"]
@@ -332,11 +333,11 @@ def nosqldatabaseInput(connIndex = 0, dictFindQuery = None, dictProjectQuery = N
         reslist = list(res)
         
         rs = pd.DataFrame(reslist)
-        logging.info(str(datetime.today()) + ' : Got data')
+        logger.writeToFile(str(datetime.today()) + ' : Got data')
 
     except Exception as e:
         rs = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
     return rs
 
@@ -351,7 +352,7 @@ def restapiInput(endpointIndex = 0, headerslist = []):
     endpointUrl = endpoint1["url"]
     requestMethod = endpoint1["method"]
     
-    logging.info(str(datetime.today()) + ' : REST API')
+    logger.writeToFile(str(datetime.today()) + ' : REST API')
     
     rs = None
 
@@ -399,10 +400,10 @@ def restapiInput(endpointIndex = 0, headerslist = []):
 
         else:
             raise Exception("Request Method is invalid")
-        logging.info(str(datetime.today()) + ' : Got data')
+        logger.writeToFile(str(datetime.today()) + ' : Got data')
 
     except Exception as e:
         rs = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
     return rs

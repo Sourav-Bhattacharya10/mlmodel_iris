@@ -17,8 +17,10 @@ import tensorflow as tf
 with open("config.json") as g:
         gdata = json.load(g)
 
+from ml_pipeline.logging import Logger
+
 # Basic Logger
-logging.basicConfig(filename = gdata["logfilepath"], level = logging.INFO)
+logger = Logger(logfilepath = gdata["logfilepath"])
 
 # Save Keras Model
 def saveEntireModel(model, modelfilepath = None):
@@ -39,10 +41,10 @@ def saveEntireModel(model, modelfilepath = None):
             modelfilepath = str(data["modelfolder"]) + str(modelfilename)
 
         keras.models.save_model(model, modelfilepath)
-        logging.info(str(datetime.today()) + ' : Saved keras model')
+        logger.writeToFile(str(datetime.today()) + ' : Saved keras model')
 
     except Exception as e:
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
 # Load Keras Model
 def loadEntireModel(modelfilepath = None):
@@ -71,14 +73,14 @@ def loadEntireModel(modelfilepath = None):
         #     keras.backend.tensorflow_backend._SESSION.close()
         #     keras.backend.tensorflow_backend._SESSION = None
 
-        # logging.info(str(datetime.today()) + ' : Cleared tf.Session')
+        # logger.writeToFile(str(datetime.today()) + ' : Cleared tf.Session')
 
         model = keras.models.load_model(modelfilepath)
-        logging.info(str(datetime.today()) + ' : Loaded keras model')
+        logger.writeToFile(str(datetime.today()) + ' : Loaded keras model')
     
     except Exception as e:
         model = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
     
     return model
 
@@ -106,10 +108,10 @@ def saveModelWeights(model, modelfilepath = None):
             file.create_dataset('weight' + str(i), data=weight[i])
         file.close()
 
-        logging.info(str(datetime.today()) + ' : Saved keras model weights')
+        logger.writeToFile(str(datetime.today()) + ' : Saved keras model weights')
     
     except Exception as e:
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
 
 
 def loadModelWeights(model, modelfilepath = None):
@@ -137,10 +139,10 @@ def loadModelWeights(model, modelfilepath = None):
             weight.append(file['weight' + str(i)][:])
         model.set_weights(weight)
 
-        logging.info(str(datetime.today()) + ' : Loaded keras model weights')
+        logger.writeToFile(str(datetime.today()) + ' : Loaded keras model weights')
     
     except Exception as e:
         model = None
-        logging.exception(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : Exception - ' + str(e.with_traceback))
     
     return model

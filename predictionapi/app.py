@@ -3,7 +3,6 @@
 # Default libraries
 import sys
 import json
-import logging
 from datetime import datetime
 
 # Libraries that needs to be installed
@@ -21,6 +20,7 @@ with open("config.json") as g:
 
 sys.path.append(gdata["mlpipelinepath"])
 
+from ml_pipeline.logging import Logger
 from ml_pipeline.data_processing import normalizeData
 from framework_models.keras_model import loadModelWeights
 
@@ -29,7 +29,7 @@ from framework_models.keras_model import loadModelWeights
 
 
 # Basic Logger
-logging.basicConfig(filename = gdata["logfilepath"], level = logging.INFO)
+logger = Logger(logfilepath = gdata["logfilepath"])
 
 
 # Enable Cross Origin Resource Sharing (CORS)
@@ -54,12 +54,12 @@ def MyKerasModel(num_input = 1, num_h1 = 1, num_h2 = 1, num_output = 3):
         
         model.compile(loss='categorical_crossentropy', optimizer=simple_adam, metrics=['accuracy'])
 
-        logging.info(str(datetime.today()) + ' : TRAIN - Compiled model')
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Compiled model')
 
     except Exception as e:
 
         model = None
-        logging.exception(str(datetime.today()) + ' : TRAIN - Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : TRAIN - Exception - ' + str(e.with_traceback))
     
     return model
 
@@ -86,7 +86,7 @@ def MyKerasModel(num_input = 1, num_h1 = 1, num_h2 = 1, num_output = 3):
 @application.route("/iris/predict", methods=["POST"])
 def predictDefault():
 
-    logging.info(str(datetime.today()) + ' : PREDICT - Calling default prediction API')
+    logger.writeToFile(str(datetime.today()) + ' : PREDICT - Calling default prediction API')
 
     # Load the json file
     with open("config.json") as f:
@@ -109,15 +109,15 @@ def predictDefault():
 
         df1 = pd.DataFrame({'petal_length':petal_lengths, 'petal_width':petal_widths, 'sepal_length':sepal_lengths, 'sepal_width':sepal_widths})
         
-        logging.info(str(datetime.today()) + ' : PREDICT - Got data')
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Got data')
 
         Xdata = df1.values
 
-        logging.info(str(datetime.today()) + ' : PREDICT - Got Xdata')
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Got Xdata')
 
         Xdata = normalizeData(Xdata, fit_transform = False)
 
-        logging.info(str(datetime.today()) + ' : PREDICT - Normalized Xdata using MinMaxScaler with fit transform as False')
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Normalized Xdata using MinMaxScaler with fit transform as False')
 
         with tf.Session(graph=tf.Graph()) as sess:
             Kb.set_session(sess)
@@ -131,29 +131,29 @@ def predictDefault():
             
             preds = model.predict(Xdata)
 
-        logging.info(str(datetime.today()) + ' : PREDICT - Loaded the model and predicted the unknown data')
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Loaded the model and predicted the unknown data')
 
         predictedcategory = [np.argmax(x) for x in preds]
 
-        logging.info(str(datetime.today()) + ' : PREDICT - Found the np.argmax of all rows')
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Found the np.argmax of all rows')
 
         iris_names = ["Iris-virginica", "Iris-setosa", "Iris-versicolor"]
         predictions = [iris_names[x] for x in predictedcategory]
 
-        logging.info(str(datetime.today()) + ' : PREDICT - Assigned categories to the predictions')
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Assigned categories to the predictions')
 
         # Read the RMSE value of the test set and append it with the prediction
         metricfile = str(data["modelfolder"]) + str(data["metricfilepath"])
         with open(metricfile) as t:
             tmpdata = json.load(t)
 
-        logging.info(str(datetime.today()) + ' : PREDICT - Read RMSE value')
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Read RMSE value')
 
         return jsonify(testaccuracy = tmpdata["testaccuracy"], data = predictions)
 
     except Exception as e:
         
-        logging.exception(str(datetime.today()) + ' : PREDICT - Exception - ' + str(e.with_traceback))
+        logger.writeToFile(str(datetime.today()) + ' : PREDICT - Exception - ' + str(e.with_traceback))
         return jsonify(error=str(e))
 
 

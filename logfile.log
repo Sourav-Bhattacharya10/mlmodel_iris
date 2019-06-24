@@ -1,0 +1,28 @@
+2019-06-24 13:04:13.244261 : CSV File
+2019-06-24 13:04:13.256231 : Got data
+2019-06-24 13:04:13.261180 : TRAIN - Got data
+2019-06-24 13:04:13.269210 : Filtered dataframe according to the columnsNamesToWorkWith list
+2019-06-24 13:04:13.275195 : Shuffled dataframe
+2019-06-24 13:04:13.281180 : Shuffled data
+2019-06-24 13:04:13.287111 : TRAIN - Filtered columns to work with and shuffled data
+2019-06-24 13:04:13.296144 : Got list of object type columns
+2019-06-24 13:04:13.306072 : TRAIN - Got Object type columns for one hot encoding
+2019-06-24 13:04:13.318751 : Got list of object type columns
+2019-06-24 13:04:13.329713 : TRAIN - Got unique values from the object type columns
+2019-06-24 13:04:13.389566 : OneHotEncoding for column "label" is done
+2019-06-24 13:04:13.397491 : Dummified data
+2019-06-24 13:04:13.403480 : TRAIN - Dummified data
+2019-06-24 13:04:13.408519 : TRAIN - Got one hot encoded column names for Y dataset
+2019-06-24 13:04:13.420474 : Got Xdata
+2019-06-24 13:04:13.434433 : Got Ydata
+2019-06-24 13:04:13.443370 : TRAIN - Divided data in X and Y
+2019-06-24 13:04:13.468313 : Saved scaler object
+2019-06-24 13:04:13.477279 : Scaled data using fit transform
+2019-06-24 13:04:13.487253 : TRAIN - Normalized Xdata using MinMaxScaler with fit transform as True
+2019-06-24 13:04:13.497226 : Got trainX, trainY, testX and testY
+2019-06-24 13:04:13.507203 : TRAIN - Split data in train and test sets
+2019-06-24 13:04:13.782940 : TRAIN - Compiled model
+2019-06-24 13:04:20.527018 : Saved keras model weights
+2019-06-24 13:04:20.545971 : TRAIN - Trained, evaluated and saved the model
+2019-06-24 13:04:20.554991 : TRAIN - TrainLoss is 97.77777777777777 and TestLoss is 100.0
+2019-06-24 13:04:20.572942 : TRAIN - Wrote Metric values
