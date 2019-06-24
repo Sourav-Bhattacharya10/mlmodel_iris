@@ -48,11 +48,11 @@ Description=uWSGI instance to serve mlmodel_iris
 After=network.target
 
 [Service]
-User=root <or your username>
+User=root <or your username (deviac)>
 Group=www-data
-WorkingDirectory=/root/home/deployedmodels/irismodel/mlmodel_iris
-Environment="PATH=/root/home/deployedmodels/irismodel/app_env/bin"
-ExecStart=/root/home/deployedmodels/irismodel/app_env/bin/uwsgi --ini uwsgi_config.ini
+WorkingDirectory=/home/deviac/home/deployedmodels/iris/mlmodel_iris
+Environment="PATH=/home/deviac/home/deployedmodels/iris/app_env/bin"
+ExecStart=/home/deviac/home/deployedmodels/iris/app_env/bin/uwsgi --ini uwsgi_config.ini
 
 [Install]
 WantedBy=multi-user.target

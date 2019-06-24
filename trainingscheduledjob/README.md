@@ -19,7 +19,7 @@ OR
 # Training Model using crontab
 ################################
 
-cd /root/home/deployedmodels/irismodel/mlmodel_iris
+cd /home/deviac/home/deployedmodels/irismodel/mlmodel_iris
 ../app_env/bin/python3 ./trainingscheduledjob/app.py
 ```
 
@@ -40,7 +40,7 @@ Now the project directory should look like this:
 ## Project Directory Structure
 
 ```shell
-. (current directory - irismodel)
+. (current directory - iris)
 |   --- modeltrainingscript.sh
 |   +-- app_env
 |   +-- mlmodel_iris
@@ -68,7 +68,7 @@ As the editor opens the crontab file, write the following:
 
 ```shell
 # Iris Classification Training Scheduled Job
-0 0 * * 0 /root/home/deployedmodels/irismodel/modeltrainingscript.sh /root/home/logs/mlmodel_iris/python/cronlogfile.log 2>&1
+0 0 * * 0 /home/deviac/home/deployedmodels/iris/modeltrainingscript.sh /home/deviac/home/logs/mlmodel_iris/python/cronlogfile.log 2>&1
 ```
 
-Check the logfile.log and the cronlogfile.log in the following path : /root/home/logs/mlmodel_iris/python
+Check the logfile.log and the cronlogfile.log in the following path : /home/deviac/home/logs/mlmodel_iris/python
